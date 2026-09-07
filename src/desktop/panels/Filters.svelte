@@ -11,7 +11,6 @@
 
 <script lang="ts">
   import type { Transaction } from '../../shared/types';
-  import type { FilterState } from './Filters.svelte';
 
   let { all, filters, onFiltersChange }: {
     all: Transaction[];

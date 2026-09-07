@@ -7,7 +7,7 @@
   } = $props();
 
   function toggle() {
-    const list = [...KNOWN_CURRENCIES];
+    const list: string[] = [...KNOWN_CURRENCIES];
     if (list.length < 2) return;
     const idx = list.indexOf(value);
     const next = list[(idx + 1) % list.length];

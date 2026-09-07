@@ -39,6 +39,8 @@
 <div
   class="zone"
   class:over={dragOver}
+  role="button"
+  tabindex="0"
   ondragover={(e) => { e.preventDefault(); dragOver = true; }}
   ondragleave={() => dragOver = false}
   ondrop={(e) => {
@@ -46,6 +48,7 @@
     dragOver = false;
     if (e.dataTransfer?.files) handleFiles(e.dataTransfer.files);
   }}
+  onkeydown={() => {}}
 >
   <div class="msg">
     <p>拖入或选择 CSV / JSON 文件</p>

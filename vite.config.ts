@@ -4,6 +4,11 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   base: '/counting-app/',
+  build: {
+    // Top-level await (used for the mobile/desktop dynamic entry split) needs
+    // a target that supports it; the esbuild default does not.
+    target: 'es2022',
+  },
   plugins: [
     svelte(),
     VitePWA({

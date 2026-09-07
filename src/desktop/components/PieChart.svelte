@@ -10,6 +10,10 @@
 
   function arcs(): { path: string; color: string; label: string; value: number }[] {
     if (total === 0) return [];
+    const nonZero = slices.filter(s => s.value > 0);
+    if (nonZero.length === 1) {
+      return [{ path: '', color: nonZero[0].color, label: nonZero[0].label, value: nonZero[0].value }];
+    }
     let acc = 0;
     const R = 80;
     const cx = 100, cy = 100;
@@ -31,7 +35,11 @@
 <div class="wrap">
   <svg viewBox="0 0 200 200" width="200" height="200">
     {#each arcs() as a}
-      <path d={a.path} fill={a.color} stroke="var(--card)" stroke-width="1" />
+      {#if a.path}
+        <path d={a.path} fill={a.color} stroke="var(--card)" stroke-width="1" />
+      {:else}
+        <circle cx="100" cy="100" r="80" fill={a.color} />
+      {/if}
     {/each}
   </svg>
   <ul class="legend">

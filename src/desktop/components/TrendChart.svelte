@@ -52,7 +52,7 @@
   });
 </script>
 
-<div bind:this={container} class="chart" />
+<div bind:this={container} class="chart"></div>
 
 <style>
   .chart { width: 100%; }

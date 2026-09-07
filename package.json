@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "dexie": "^4.4.5",
-    "svelte-spa-router": "^4.0.2",
     "uplot": "^1.6.32"
   }
 }

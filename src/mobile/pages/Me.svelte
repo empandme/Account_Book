@@ -7,7 +7,6 @@
   let transactions = $state<Transaction[]>([]);
   let categories = $state<Category[]>([]);
   let defaultCurrency = $state('CNY');
-  let showingCatEditor = $state(false);
 
   $effect(() => { load(); });
 

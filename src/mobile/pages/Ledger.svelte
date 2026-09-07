@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { listTransactions, softDeleteTransaction, updateTransaction, listCategories } from '../../shared/db';
+  import { listTransactions, softDeleteTransaction, listCategories } from '../../shared/db';
   import { formatAmount } from '../../shared/currency';
   import type { Transaction, Category } from '../../shared/types';
 
@@ -77,8 +77,14 @@
 </div>
 
 {#if selected}
-  <div class="modal" onclick={() => selected = null}>
-    <div class="sheet" onclick={(e) => e.stopPropagation()}>
+  <div
+    class="modal"
+    role="button"
+    tabindex="0"
+    onclick={() => selected = null}
+    onkeydown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') selected = null; }}
+  >
+    <div class="sheet" role="presentation" onclick={(e) => e.stopPropagation()}>
       <div class="title">{selected.category} · {formatAmount(selected.amount, selected.currency)}</div>
       <div class="note">{selected.note}</div>
       <div class="actions">

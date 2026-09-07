@@ -13,14 +13,29 @@
 </div>
 
 <style>
-  .tabs { display: flex; gap: 4px; padding: 8px 16px; border-bottom: 1px solid var(--border); }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 3px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
   button {
-    padding: 6px 12px;
+    padding: 4px 14px;
     border: none;
     background: transparent;
     color: var(--fg-muted);
-    border-bottom: 2px solid transparent;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
   }
-  .active { color: var(--accent); border-bottom-color: var(--accent); }
+  button:hover { color: var(--fg); }
+  .active {
+    background: var(--card);
+    color: var(--accent);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
 </style>

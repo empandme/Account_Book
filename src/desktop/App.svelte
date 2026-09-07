@@ -38,6 +38,14 @@
     });
   });
 
+  let summary = $derived.by(() => {
+    if (!loaded) return null;
+    const txs = loaded.transactions.filter(t => t.deleted_at === null);
+    if (txs.length === 0) return null;
+    const dates = txs.map(t => t.occurred_at.slice(0, 10)).sort();
+    return { count: txs.length, from: dates[0], to: dates[dates.length - 1] };
+  });
+
   function exportPDF() {
     window.print();
   }
@@ -83,13 +91,23 @@
 {#if !loaded}
   <FileDropzone onLoaded={(d) => loaded = d} />
 {:else}
-  <div class="topbar">
-    <CurrencyTabs currencies={currencies} value={currency} onChange={(c) => currency = c} />
-    <div class="export-actions">
-      <button onclick={exportPDF}>导出 PDF</button>
-      <button onclick={exportPNG}>导出 PNG</button>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">¥</span>
+      <span class="title">记账 · 分析</span>
     </div>
-  </div>
+    <div class="center">
+      <CurrencyTabs currencies={currencies} value={currency} onChange={(c) => currency = c} />
+      {#if summary}
+        <span class="meta">{summary.count} 笔 · {summary.from} → {summary.to}</span>
+      {/if}
+    </div>
+    <div class="actions">
+      <button class="ghost" onclick={() => { loaded = null; }}>重新导入</button>
+      <button onclick={exportPDF}>导出 PDF</button>
+      <button class="primary" onclick={exportPNG}>导出 PNG</button>
+    </div>
+  </header>
   <div class="three">
     <aside class="left">
       <Filters all={loaded.transactions.filter(t => t.currency === currency)}
@@ -108,26 +126,77 @@
 <style>
   .three {
     display: grid;
-    grid-template-columns: 260px 1fr 360px;
-    height: calc(100vh - 50px);
+    grid-template-columns: 280px 1fr 380px;
+    height: calc(100vh - 56px);
   }
   .left, .right { overflow-y: auto; border-right: 1px solid var(--border); }
   .right { border-right: none; border-left: 1px solid var(--border); }
   .mid { overflow-y: auto; }
-  .topbar { display: flex; justify-content: space-between; align-items: center; }
-  .export-actions { display: flex; gap: 8px; padding: 8px 16px; }
-  .export-actions button {
-    padding: 4px 12px;
+
+  .topbar {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 20px;
+    height: 56px;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+    letter-spacing: 0.2px;
+  }
+  .center {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+  }
+  .meta {
+    font-size: 12px;
+    color: var(--fg-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .actions { display: flex; gap: 8px; }
+  .actions button {
+    padding: 6px 14px;
     background: var(--bg);
     color: var(--fg);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
   }
+  .actions button:hover { border-color: var(--accent); color: var(--accent); }
+  .actions .ghost { background: transparent; color: var(--fg-muted); }
+  .actions .primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .actions .primary:hover { color: white; opacity: 0.9; }
+
   @media print {
     .left, .right, .topbar { display: none !important; }
     .mid { overflow: visible !important; height: auto !important; }
-    .three { display: block !important; height: auto !important; }
+    .three { display: block !important; height: auto !important; grid-template-columns: none !important; }
   }
 </style>

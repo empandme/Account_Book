@@ -1,11 +1,17 @@
 <script lang="ts">
-  import { listTransactions, softDeleteTransaction, listCategories } from '../../shared/db';
-  import { formatAmount } from '../../shared/currency';
+  import { listTransactions, softDeleteTransaction, updateTransaction, listCategories } from '../../shared/db';
+  import { formatAmount, fromMinorUnits, toMinorUnits, currencyDigits, KNOWN_CURRENCIES } from '../../shared/currency';
   import type { Transaction, Category } from '../../shared/types';
 
   let transactions = $state<Transaction[]>([]);
   let categories = $state<Category[]>([]);
   let selected = $state<Transaction | null>(null);
+  let editing = $state(false);
+  let editAmount = $state('');
+  let editCurrency = $state('CNY');
+  let editCategoryId = $state<string | null>(null);
+  let editNote = $state('');
+  let editOccurredAt = $state('');
 
   $effect(() => { load(); });
 
@@ -46,9 +52,48 @@
     return key;
   }
 
+  function toLocalDT(iso: string): string {
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  function fromLocalDT(local: string): string {
+    return new Date(local).toISOString();
+  }
+
+  function beginEdit(t: Transaction) {
+    editAmount = fromMinorUnits(t.amount, t.currency).toFixed(currencyDigits(t.currency));
+    editCurrency = t.currency;
+    editCategoryId = categories.find(c => c.name === t.category)?.id ?? null;
+    editNote = t.note;
+    editOccurredAt = t.occurred_at;
+    editing = true;
+  }
+
+  async function saveEdit() {
+    if (!selected) return;
+    const major = parseFloat(editAmount);
+    if (isNaN(major) || major <= 0) return;
+    const cat = categories.find(c => c.id === editCategoryId);
+    await updateTransaction(selected.id, {
+      amount: toMinorUnits(major, editCurrency),
+      currency: editCurrency,
+      category: cat?.name ?? selected.category,
+      note: editNote,
+      occurred_at: editOccurredAt,
+    });
+    closeModal();
+    await load();
+  }
+
+  function closeModal() {
+    selected = null;
+    editing = false;
+  }
+
   async function onDelete(t: Transaction) {
     await softDeleteTransaction(t.id);
-    selected = null;
+    closeModal();
     await load();
   }
 </script>
@@ -81,16 +126,55 @@
     class="modal"
     role="button"
     tabindex="0"
-    onclick={() => selected = null}
-    onkeydown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') selected = null; }}
+    onclick={closeModal}
+    onkeydown={(e) => { if (e.key === 'Escape') closeModal(); }}
   >
     <div class="sheet" role="presentation" onclick={(e) => e.stopPropagation()}>
-      <div class="title">{selected.category} · {formatAmount(selected.amount, selected.currency)}</div>
-      <div class="note">{selected.note}</div>
-      <div class="actions">
-        <button class="danger" onclick={() => onDelete(selected!)}>删除</button>
-        <button onclick={() => selected = null}>取消</button>
-      </div>
+      {#if editing}
+        <div class="title">编辑</div>
+        <div class="field">
+          <div class="lbl">金额</div>
+          <div class="row-inline">
+            <input class="amt-input" type="text" inputmode="decimal" bind:value={editAmount} />
+            <select class="cur-sel" bind:value={editCurrency}>
+              {#each KNOWN_CURRENCIES as c}<option value={c}>{c}</option>{/each}
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <div class="lbl">分类</div>
+          <select class="full" bind:value={editCategoryId}>
+            {#each categories.filter(c => !c.archived) as c}
+              <option value={c.id}>{c.icon} {c.name}</option>
+            {/each}
+          </select>
+        </div>
+        <div class="field">
+          <div class="lbl">备注</div>
+          <input class="full" type="text" bind:value={editNote} />
+        </div>
+        <div class="field">
+          <div class="lbl">时间</div>
+          <input
+            class="full"
+            type="datetime-local"
+            value={toLocalDT(editOccurredAt)}
+            oninput={(e) => editOccurredAt = fromLocalDT((e.target as HTMLInputElement).value)}
+          />
+        </div>
+        <div class="actions">
+          <button class="danger" onclick={() => onDelete(selected!)}>删除</button>
+          <button class="submit" onclick={saveEdit}>保存</button>
+        </div>
+      {:else}
+        <div class="title">{selected.category} · {formatAmount(selected.amount, selected.currency)}</div>
+        <div class="note">{selected.note || '（无备注）'}</div>
+        <div class="time">{selected.occurred_at.slice(0, 16).replace('T', ' ')}</div>
+        <div class="actions">
+          <button onclick={() => beginEdit(selected!)}>编辑</button>
+          <button class="danger" onclick={() => onDelete(selected!)}>删除</button>
+        </div>
+      {/if}
     </div>
   </div>
 {/if}
@@ -126,6 +210,7 @@
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.4);
     display: flex; align-items: flex-end; justify-content: center;
+    z-index: 100;
   }
   .sheet {
     background: var(--card);
@@ -136,8 +221,22 @@
     padding: 20px 16px 24px;
   }
   .title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
-  .note { color: var(--fg-muted); margin-bottom: 16px; }
-  .actions { display: flex; gap: 12px; }
+  .note { color: var(--fg-muted); margin-bottom: 8px; }
+  .time { color: var(--fg-muted); font-size: 12px; margin-bottom: 16px; }
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  .field .lbl { font-size: 12px; color: var(--fg-muted); }
+  .row-inline { display: flex; gap: 8px; }
+  .amt-input { flex: 1; }
+  .cur-sel { width: 88px; }
+  .field input, .field select, .full {
+    padding: 10px;
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  .actions { display: flex; gap: 12px; margin-top: 12px; }
   .actions button {
     flex: 1;
     padding: 12px;
@@ -147,4 +246,5 @@
     border-radius: var(--radius);
   }
   .danger { color: var(--danger); border-color: var(--danger); }
+  .submit { background: var(--accent); color: white; border-color: var(--accent); }
 </style>

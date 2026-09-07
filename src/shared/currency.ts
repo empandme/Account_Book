@@ -8,7 +8,7 @@ const SYMBOLS: Record<string, string> = {
   HKD: 'HK$', KRW: '₩', TWD: 'NT$',
 };
 
-export const KNOWN_CURRENCIES = ['CNY', 'USD', 'JPY', 'EUR', 'GBP', 'HKD', 'KRW', 'TWD'] as const;
+export const KNOWN_CURRENCIES = ['CNY', 'USD'] as const;
 
 export function currencyDigits(code: string): number {
   return DIGITS[code] ?? 2;

@@ -55,9 +55,8 @@ describe('formatAmount', () => {
 });
 
 describe('KNOWN_CURRENCIES', () => {
-  it('contains at least CNY / USD / JPY', () => {
+  it('contains CNY and USD', () => {
     expect(KNOWN_CURRENCIES).toContain('CNY');
     expect(KNOWN_CURRENCIES).toContain('USD');
-    expect(KNOWN_CURRENCIES).toContain('JPY');
   });
 });

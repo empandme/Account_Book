@@ -99,26 +99,34 @@
 </script>
 
 <div class="page">
-  {#each grouped as [day, list] (day)}
-    <div class="day-header">
-      <span>{friendlyDay(day)}</span>
-      <span class="totals">
-        {#each Object.entries(dayTotals(list)) as [cur, minor]}
-          <span>{formatAmount(minor, cur)}</span>
-        {/each}
-      </span>
+  {#if transactions.length === 0}
+    <div class="empty">
+      <div class="empty-icon">📖</div>
+      <div class="empty-title">还没有账目</div>
+      <div class="empty-hint">切到"记账"记第一笔</div>
     </div>
-    {#each list as t (t.id)}
-      <button class="row" onclick={() => selected = t}>
-        <span class="icon">{iconOf(t.category)}</span>
-        <span class="body">
-          <span class="cat">{t.category}</span>
-          <span class="note">{t.note}</span>
+  {:else}
+    {#each grouped as [day, list] (day)}
+      <div class="day-header">
+        <span>{friendlyDay(day)}</span>
+        <span class="totals">
+          {#each Object.entries(dayTotals(list)) as [cur, minor]}
+            <span>{formatAmount(minor, cur)}</span>
+          {/each}
         </span>
-        <span class="amt">{formatAmount(t.amount, t.currency)}</span>
-      </button>
+      </div>
+      {#each list as t (t.id)}
+        <button class="row" onclick={() => selected = t}>
+          <span class="icon">{iconOf(t.category)}</span>
+          <span class="body">
+            <span class="cat">{t.category}</span>
+            <span class="note">{t.note}</span>
+          </span>
+          <span class="amt">{formatAmount(t.amount, t.currency)}</span>
+        </button>
+      {/each}
     {/each}
-  {/each}
+  {/if}
 </div>
 
 {#if selected}
@@ -180,13 +188,16 @@
 {/if}
 
 <style>
-  .page { padding-bottom: 60px; }
+  .page { padding: 16px 0 12px; }
   .day-header {
     display: flex;
     justify-content: space-between;
-    padding: 12px 16px 4px;
+    align-items: baseline;
+    padding: 16px 20px 6px;
     color: var(--fg-muted);
-    font-size: 13px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
   }
   .day-header .totals { display: flex; gap: 8px; }
   .row {
@@ -206,6 +217,17 @@
   .cat { font-size: 15px; }
   .note { font-size: 12px; color: var(--fg-muted); }
   .amt { font-size: 15px; font-variant-numeric: tabular-nums; }
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    gap: 6px;
+  }
+  .empty-icon { font-size: 44px; margin-bottom: 8px; }
+  .empty-title { font-size: 16px; font-weight: 600; color: var(--fg); }
+  .empty-hint { font-size: 13px; color: var(--fg-muted); }
   .modal {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.4);

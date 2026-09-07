@@ -14,14 +14,24 @@
 </main>
 
 <nav>
-  <button class:active={tab === 'record'} onclick={() => tab = 'record'}>记账</button>
-  <button class:active={tab === 'ledger'} onclick={() => tab = 'ledger'}>流水</button>
-  <button class:active={tab === 'me'} onclick={() => tab = 'me'}>我的</button>
+  <button class:active={tab === 'record'} onclick={() => tab = 'record'}>
+    <span class="tab-icon">✎</span>
+    <span class="tab-label">记账</span>
+  </button>
+  <button class:active={tab === 'ledger'} onclick={() => tab = 'ledger'}>
+    <span class="tab-icon">☰</span>
+    <span class="tab-label">流水</span>
+  </button>
+  <button class:active={tab === 'me'} onclick={() => tab = 'me'}>
+    <span class="tab-icon">◉</span>
+    <span class="tab-label">我的</span>
+  </button>
 </nav>
 
 <style>
   main {
-    padding-bottom: 64px;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
     min-height: 100vh;
   }
   nav {
@@ -29,16 +39,25 @@
     bottom: 0; left: 0; right: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    background: var(--card);
+    background: color-mix(in srgb, var(--card) 92%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
     border-top: 1px solid var(--border);
     padding-bottom: env(safe-area-inset-bottom);
+    z-index: 50;
   }
   nav button {
-    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px 6px;
     border: none;
     background: transparent;
     color: var(--fg-muted);
-    font-size: 13px;
+    font-size: 11px;
   }
+  .tab-icon { font-size: 18px; line-height: 1; }
+  .tab-label { font-size: 11px; letter-spacing: 0.5px; }
   nav .active { color: var(--accent); }
 </style>

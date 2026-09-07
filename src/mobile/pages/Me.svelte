@@ -129,9 +129,9 @@
 </div>
 
 <style>
-  .page { padding: 12px 12px 80px; display: flex; flex-direction: column; gap: 12px; }
-  .card { background: var(--card); border-radius: var(--radius); padding: 14px; }
-  .title { font-size: 13px; color: var(--fg-muted); margin-bottom: 8px; }
+  .page { padding: 16px 14px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--card); border-radius: 14px; padding: 16px; }
+  .title { font-size: 12px; color: var(--fg-muted); margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
   .line { display: flex; justify-content: space-between; padding: 4px 0; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chips button {

@@ -42,20 +42,35 @@
   .keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 12px;
+    gap: 10px;
+    padding: 10px 12px;
   }
   button {
-    height: 56px;
+    height: 58px;
     border: none;
-    border-radius: var(--radius);
+    border-radius: 14px;
     background: var(--card);
     color: var(--fg);
-    font-size: 24px;
+    font-size: 26px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    transition: background 0.08s;
+  }
+  button:active { background: var(--border); transform: scale(0.98); }
+  .muted { opacity: 0.3; }
+  .clear {
+    background: var(--border);
+    color: var(--fg-muted);
+    font-size: 18px;
     font-weight: 500;
   }
-  button:active { background: var(--border); }
-  .muted { opacity: 0.35; }
-  .clear { background: var(--border); color: var(--fg-muted); grid-column: span 1; }
-  .submit { background: var(--accent); color: white; grid-column: span 2; font-size: 18px; }
+  .submit {
+    background: var(--accent);
+    color: white;
+    grid-column: span 2;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 2px;
+  }
+  .submit:active { background: color-mix(in srgb, var(--accent) 85%, black); }
 </style>

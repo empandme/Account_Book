@@ -61,8 +61,11 @@
 
 <div class="page">
   <div class="header">
-    <div class="amount">{displayAmount()}</div>
-    <CurrencyPicker value={currency} recent={recentCurrencies} onChange={(c) => currency = c} />
+    <div class="hint">支出</div>
+    <div class="amount-row">
+      <div class="amount">{displayAmount()}</div>
+      <CurrencyPicker value={currency} recent={recentCurrencies} onChange={(c) => currency = c} />
+    </div>
   </div>
 
   <CategoryGrid
@@ -80,21 +83,38 @@
 </div>
 
 <style>
-  .page { padding-bottom: 60px; }
+  .page { padding-bottom: 12px; }
   .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px 16px 8px;
+    padding: 16px 20px 12px;
   }
-  .amount { font-size: 40px; font-weight: 600; color: var(--fg); }
+  .hint {
+    font-size: 12px;
+    color: var(--fg-muted);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .amount-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .amount {
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--fg);
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+  }
   .meta { display: flex; gap: 8px; padding: 0 12px 8px; }
   .meta input {
     flex: 1;
-    padding: 8px 10px;
+    padding: 10px 12px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     background: var(--card);
     color: var(--fg);
+    font-size: 14px;
   }
 </style>
